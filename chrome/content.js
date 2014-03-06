@@ -10,25 +10,25 @@ $(function() {
         if(isExternal(url)) {
             console.log($(this))
 
-            if ( ( url.indexOf(".jpg") > 0 ) || ( url.indexOf(".png") > 0 ) || ( url.indexOf(".gif") > 0 ) ) {
-                $this.css({'backgroundColor': 'yellow'});
-
-                hoverDelay($this, function() {
+            $this.css({'backgroundColor': 'yellow'});
+            hoverDelay($this, function() {
+                if ( ( url.indexOf(".jpg") > 0 ) || ( url.indexOf(".png") > 0 ) || ( url.indexOf(".gif") > 0 ) ) {
                     var image = new Image();
                     image.src = url;
                     $previewer.html(image);
-                    $previewer.css({ 'top': $this.offset().top, 'left': $this.offset().left + $this.width() + 25 })
-                    $previewer.fadeIn();
-                }, function() {
-                    $previewer.fadeOut();
-                })
-            } else {
-                hoverDelay($this, function() {
-                    $.get(url).success(function(data) {
-                        console.log(data)
+                } else {
+                    $previewer.css({ 'width': '800', 'height': '500' })
+                    $previewer.html('<iframe src="'+ url +'"></iframe>');
+                }
+                $previewer.css({ 'top': $this.offset().top, 'left': $this.offset().left + $this.width() + 25 })
+                $previewer.fadeIn();
+            }, function() {
+                setTimeout(function() {
+                    checkIfHovered($previewer, function() {
+                        $previewer.fadeOut();
                     })
-                });
-            }
+                }, 100)
+            });
         }
     });
 });
@@ -40,15 +40,24 @@ function isExternal(url) {
     return false;
 }
 
-function hoverDelay($el, fn, fn2, delay) {
+function hoverDelay($el, fn1, fn2) {
     var delay_time = 500;
-    if (delay) delay_time = delay;
+
     $el.hover(function() {
         window.hoverTimeout = setTimeout(function() {
-            fn();
+            if (fn1) fn1();
         }, delay_time)
     }, function() {
         clearTimeout(window.hoverTimeout)
-        fn2();
+        if (fn2) fn2();
     })
+}
+
+function checkIfHovered($el, callback) {
+    console.log('check')
+    if ($el.is(":hover")) {
+        setTimeout(function() { checkIfHovered($el, callback) }, 100)
+    } else {
+        callback();
+    }
 }
