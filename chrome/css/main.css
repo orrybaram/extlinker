@@ -1,0 +1,7 @@
+#ext-link-viewer {
+    position: fixed;
+    width: 50%;
+    height: 50%;
+    top: 340px;
+    z-index: 999999999;
+}
