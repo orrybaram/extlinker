@@ -1,8 +1,18 @@
 #ext-link-viewer {
-    position: fixed;
-    width: 50%;
-    height: 50%;
-    top: 340px;
+    position: absolute;
+    max-width: 600px;
     z-index: 999999999;
     display: none;
+    padding: 5px;
+    border: 1px solid #D1D1D1;
+    background-color: #FFF;
+    border-radius: 3px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.21);
+}
+
+#ext-link-viewer img {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
 }
