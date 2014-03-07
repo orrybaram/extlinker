@@ -1,10 +1,10 @@
 {
   "manifest_version": 2,
 
-  "name": "Ext Linker",
+  "name": "Link Previewer",
   "description": "Provides previews to external links in articles",
 
-  "version": "0.0.1",
+  "version": "0.0.2",
 
   "permissions": [
     "*://*/*"
