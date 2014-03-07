@@ -58,7 +58,7 @@ $(function() {
                         if ($previewer.height() < window.innerHeight) {
                             $previewer.css({ 'top': '50%', 'margin-top': -$previewer.height() / 2, 'margin-left': -$previewer.width() / 2 })
                         } else {
-                            $previewer.css({'top':'50px', 'margin-top': '0'})
+                            $previewer.css({'top':'50px', 'margin-top': '0', 'margin-left': -$previewer.width() / 2 })
                         }
                     },100)
 
