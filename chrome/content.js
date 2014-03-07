@@ -1,4 +1,7 @@
 // Content
+
+var hover_delay_interval = 1000;
+
 $(function() {
 
     // Check to see that we're not on an secured site, otherwise this thing wont work
@@ -9,72 +12,86 @@ $(function() {
         $previewer_container.append($previewer);
         $('body').append($previewer_container);
 
-        $('p').find('a').each(function() {
-            var $this = $(this);
-            var url = $(this).attr('href');
-            if(isExternal(url) && url.indexOf('.zip') < 0) {
-                $this.css({
-                  'backgroundColor': shadeRGBColor($this.css('color'), .97),
-                  'border-bottom': '1px solid '+ shadeRGBColor($this.css('color'), .7),
-                  'text-decoration': 'none',
-                  'display': 'inline-block'
-                })
+        function scanLinks() {
+            $('p').find('a').each(function() {
+                var $this = $(this);
 
-                hoverDelay($this, function() {
+                if (!$this.hasClass('scanned-by-link-previewer')) {
+                    $this.addClass('scanned-by-link-previewer');
 
-                    // URL IS AN IMAGE
-                    if ( ( url.indexOf(".jpg") > 0 ) || ( url.indexOf(".png") > 0 ) || ( url.indexOf(".gif") > 0 ) ) {
-                        var image = new Image();
-                        image.src = url;
-                        $previewer.html(image);
-                        $(image).load(function() {
-                            $previewer.css({ 'height': image.height, 'width': image.width })
+                    var url = $(this).attr('href');
+                    if(isExternal(url) && url.indexOf('.zip') < 0) {
+                        $this.css({
+                          'backgroundColor': shadeRGBColor($this.css('color'), .97),
+                          'border-bottom': '1px solid '+ shadeRGBColor($this.css('color'), .7),
+                          'text-decoration': 'none',
+                          'display': 'inline-block'
                         })
-                    }
 
-                    else if ($this[0].host === 'www.youtube.com') {
-                        var video_id = getParmFromHash(url, 'v')
-                        console.log(video_id)
-                        $previewer.html('<iframe src="//www.youtube.com/embed/'+ video_id +'"></iframe>');
-                        $previewer.css({ 'width': '1067', 'height': '600' })
-                    }
+                        hoverDelay($this, function() {
 
-                    // URL IS AN EXTERNAL LINK
-                    else {
-                        $previewer.css({ 'width': window.innerWidth - 300, 'height': window.innerHeight - 100 })
-                        $previewer.html('<iframe src="'+ url +'"></iframe>');
+                            // URL IS AN IMAGE
+                            if ( ( url.indexOf(".jpg") > 0 ) || ( url.indexOf(".png") > 0 ) || ( url.indexOf(".gif") > 0 ) ) {
+                                var image = new Image();
+                                image.src = url;
+                                $previewer.html(image);
+                                $(image).load(function() {
+                                    $previewer.css({ 'height': image.height, 'width': image.width })
+                                })
+                            }
+                            else if ($this[0].host === 'vimeo.com') {
+                                var video_id = $this[0].pathname.replace('/', '');
+                                $previewer.html('<iframe src="//player.vimeo.com/video/' + video_id + '?color=c9ff23" width="1068" height="600" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>');
+                                $previewer.css({ 'width': '1068', 'height': '600' })
+                            }
+                            else if ($this[0].host === 'www.youtube.com') {
+                                var video_id = getParmFromHash(url, 'v')
+                                console.log(video_id)
+                                $previewer.html('<iframe src="//www.youtube.com/embed/'+ video_id +'"></iframe>');
+                                $previewer.css({ 'width': '1067', 'height': '600' })
+                            }
 
-                        $.get(url).success(function(data, status, request) {
-                          var headers = request.getAllResponseHeaders();
-                          if (headers.indexOf('X-Frame-Options: SAMEORIGIN') > 0) {
-                              $previewer.html('<p class="error">Failed to load this site</p>');
-                              setTimeout(function() {
-                                  $previewer_container.fadeOut();
-                              }, 2000)
-                          }
+                            // URL IS AN EXTERNAL LINK
+                            else {
+                                $previewer.css({ 'width': window.innerWidth - 300, 'height': window.innerHeight - 100 })
+                                $previewer.html('<iframe src="'+ url +'"></iframe>');
+
+                                $.get(url).success(function(data, status, request) {
+                                  var headers = request.getAllResponseHeaders();
+                                  if (headers.indexOf('X-Frame-Options: SAMEORIGIN') > 0) {
+                                      $previewer.html('<p class="error">Failed to load this site</p>');
+                                      setTimeout(function() {
+                                          $previewer_container.fadeOut();
+                                      }, 2000)
+                                  }
+                                });
+                            }
+                            setTimeout(function() {
+                                if ($previewer.height() < window.innerHeight) {
+                                    $previewer.css({ 'top': '50%', 'margin-top': -$previewer.height() / 2, 'margin-left': -$previewer.width() / 2 })
+                                } else {
+                                    $previewer.css({'top':'50px', 'margin-top': '0', 'margin-left': -$previewer.width() / 2 })
+                                }
+                            },100)
+
+                            $previewer_container.fadeIn();
+
+                        }, function() {
+                            setTimeout(function() {
+                                checkIfHovered($previewer, function() {
+                                    $previewer_container.fadeOut();
+                                    $previewer.find('iframe').remove();
+                                })
+                            }, 100)
                         });
                     }
-                    setTimeout(function() {
-                        if ($previewer.height() < window.innerHeight) {
-                            $previewer.css({ 'top': '50%', 'margin-top': -$previewer.height() / 2, 'margin-left': -$previewer.width() / 2 })
-                        } else {
-                            $previewer.css({'top':'50px', 'margin-top': '0', 'margin-left': -$previewer.width() / 2 })
-                        }
-                    },100)
+                }
+            });
 
-                    $previewer_container.fadeIn();
-
-                }, function() {
-                    setTimeout(function() {
-                        checkIfHovered($previewer, function() {
-                            $previewer_container.fadeOut();
-                            $previewer.find('iframe').remove();
-                        })
-                    }, 100)
-                });
-            }
-        });
-  }
+            setTimeout(function() { scanLinks() }, 5000);
+        }
+        scanLinks();
+    }
 });
 
 // UTILS =============================================== //
@@ -87,12 +104,10 @@ function isExternal(url) {
 }
 
 function hoverDelay($el, fn1, fn2) {
-    var delay_time = 500;
-
     $el.hover(function() {
         window.hoverTimeout = setTimeout(function() {
             if (fn1) fn1();
-        }, delay_time)
+        }, hover_delay_interval)
     }, function() {
         clearTimeout(window.hoverTimeout)
         if (fn2) fn2();
