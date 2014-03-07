@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Link Previewer",
-  "description": "Provides previews to external links in articles",
+  "description": "Provides previews to external links, images, and videos in articles",
 
   "version": "0.0.2",
 
