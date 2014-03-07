@@ -20,7 +20,15 @@ $(function() {
                     $this.addClass('scanned-by-link-previewer');
 
                     var url = $(this).attr('href');
-                    if(isExternal(url) && url.indexOf('.zip') < 0) {
+
+
+                    var blacklisted = false;
+
+                    if (url.indexOf('.zip') > 0 || url.indexOf('mailto') > 0) {
+                        blacklisted = true;
+                    }
+                    console.log(blacklisted)
+                    if(isExternal(url) && !blacklisted) {
                         $this.css({
                           'backgroundColor': shadeRGBColor($this.css('color'), .97),
                           'border-bottom': '1px solid '+ shadeRGBColor($this.css('color'), .7),
@@ -58,11 +66,14 @@ $(function() {
 
                                 $.get(url).success(function(data, status, request) {
                                   var headers = request.getAllResponseHeaders();
-                                  if (headers.indexOf('X-Frame-Options: SAMEORIGIN') > 0) {
-                                      $previewer.html('<p class="error">Failed to load this site</p>');
-                                      setTimeout(function() {
-                                          $previewer_container.fadeOut();
-                                      }, 2000)
+
+                                  console.log(headers)
+
+                                  if (headers.indexOf('SAMEORIGIN') > 0) {
+                                      $previewer.html('<p class="previewer_error">Failed to load this site</p><p class="previewer_link">Go directly to <a target="_blank" class="scanned-by-link-previewer" href="' + url + '">'+ url +'</a>');
+                                    //   setTimeout(function() {
+                                    //       $previewer_container.fadeOut();
+                                    //   }, 2000)
                                   }
                                 });
                             }

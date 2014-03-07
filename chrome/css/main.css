@@ -39,10 +39,18 @@
     height: 100%;
 }
 
-#link-previewer .error {
+#link-previewer .previewer_error {
     text-align: center;
     color:#DDD;
     font-weight: bold;
     padding-top: 200px;
     font-size: 30px;
+}
+
+#link-previewer .previewer_link {
+    text-align: center;
+    color:#DDD;
+    font-weight: bold;
+    padding-top: 50px;
+    font-size: 25px;
 }
