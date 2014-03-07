@@ -1,31 +1,52 @@
 // Content
 $(function() {
 
-    var $previewer = $('<div id="ext-link-viewer"></div>');
-    $('body').append($previewer);
+
+    var $previewer_container = $('<div id="link-previewer-container"></div>');
+    var $previewer = $('<div id="link-previewer"></div>');
+
+    $previewer_container.append($previewer);
+    $('body').append($previewer_container);
 
     $('p').find('a').each(function() {
         var $this = $(this);
         var url = $(this).attr('href');
-        if(isExternal(url)) {
+        if(isExternal(url) && url.indexOf('.zip') < 0) {
             console.log($(this))
 
             $this.css({'backgroundColor': 'yellow'});
             hoverDelay($this, function() {
+
+                // URL IS AN IMAGE
                 if ( ( url.indexOf(".jpg") > 0 ) || ( url.indexOf(".png") > 0 ) || ( url.indexOf(".gif") > 0 ) ) {
                     var image = new Image();
                     image.src = url;
                     $previewer.html(image);
-                } else {
+                    $previewer.css({ 'height': 'auto' })
+                }
+
+                else if ($this[0].host === 'www.youtube.com') {
+                    var video_id = getParmFromHash(url, 'v')
+                    console.log(video_id)
+                    $previewer.html('<iframe src="//www.youtube.com/embed/'+ video_id +'"></iframe>');
+                    $previewer.css({ 'width': '640', 'height': '360' })
+                }
+
+                // URL IS NORMAL
+                else {
                     $previewer.css({ 'width': '800', 'height': '500' })
                     $previewer.html('<iframe src="'+ url +'"></iframe>');
                 }
-                $previewer.css({ 'top': $this.offset().top, 'left': $this.offset().left + $this.width() + 25 })
-                $previewer.fadeIn();
+                setTimeout(function() {
+                    $previewer.css({ 'margin-top': -$previewer.height() / 2, 'margin-left': -$previewer.width() / 2 })
+                },100)
+
+                $previewer_container.fadeIn();
+
             }, function() {
                 setTimeout(function() {
                     checkIfHovered($previewer, function() {
-                        $previewer.fadeOut();
+                        $previewer_container.fadeOut();
                     })
                 }, 100)
             });
@@ -60,4 +81,10 @@ function checkIfHovered($el, callback) {
     } else {
         callback();
     }
+}
+
+function getParmFromHash(url, parm) {
+    var re = new RegExp("[?&]" + parm + "=([^&]+)(&|$)");
+    var match = url.match(re);
+    return(match ? match[1] : "");
 }
