@@ -13,8 +13,6 @@ $(function() {
             var $this = $(this);
             var url = $(this).attr('href');
             if(isExternal(url) && url.indexOf('.zip') < 0) {
-                console.log($(this))
-
                 $this.css({
                   'backgroundColor': shadeRGBColor($this.css('color'), .97),
                   'border-bottom': '1px solid '+ shadeRGBColor($this.css('color'), .7),
@@ -43,15 +41,24 @@ $(function() {
 
                     // URL IS AN EXTERNAL LINK
                     else {
-
                         $previewer.css({ 'width': window.innerWidth - 300, 'height': window.innerHeight - 100 })
                         $previewer.html('<iframe src="'+ url +'"></iframe>');
+
+                        $.get(url).success(function(data, status, request) {
+                          var headers = request.getAllResponseHeaders();
+                          if (headers.indexOf('X-Frame-Options: SAMEORIGIN') > 0) {
+                              $previewer.html('<p class="error">Failed to load this site</p>');
+                              setTimeout(function() {
+                                  $previewer_container.fadeOut();
+                              }, 2000)
+                          }
+                        });
                     }
                     setTimeout(function() {
                         if ($previewer.height() < window.innerHeight) {
                             $previewer.css({ 'top': '50%', 'margin-top': -$previewer.height() / 2, 'margin-left': -$previewer.width() / 2 })
                         } else {
-                            $previewer.css({'top':'20px', 'margin-top': '0'})
+                            $previewer.css({'top':'50px', 'margin-top': '0'})
                         }
                     },100)
 
@@ -91,7 +98,6 @@ function hoverDelay($el, fn1, fn2) {
 }
 
 function checkIfHovered($el, callback) {
-    console.log('check')
     if ($el.is(":hover")) {
         setTimeout(function() { checkIfHovered($el, callback) }, 100)
     } else {
