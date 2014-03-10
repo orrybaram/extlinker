@@ -60,20 +60,27 @@ $(function() {
 
                             // URL IS AN EXTERNAL LINK
                             else {
-                                $previewer.css({ 'width': window.innerWidth - 300, 'height': window.innerHeight - 100 })
-                                $previewer.html('<iframe src="'+ url +'"></iframe>');
+                                var $iframe = $('<iframe src="'+ url +'"></iframe>')
+                                var $loading = $('<p class="loading">Loading...</p>')
 
+                                $previewer
+                                    .css({ 'width': window.innerWidth - 300, 'height': window.innerHeight - 100 })
+                                    .html('')
+                                    .append($loading)
+                                    .append($iframe);
+
+                                $iframe.hide().load(function() {
+                                   $loading.hide();
+                                   $iframe.fadeIn();
+                                })
+
+                                // Test URL for errors
                                 $.get(url).success(function(data, status, request) {
-                                  var headers = request.getAllResponseHeaders();
+                                    var headers = request.getAllResponseHeaders();
 
-                                  console.log(headers)
-
-                                  if (headers.indexOf('SAMEORIGIN') > 0) {
-                                      $previewer.html('<p class="previewer_error">Failed to load this site</p><p class="previewer_link">Go directly to <a target="_blank" class="scanned-by-link-previewer" href="' + url + '">'+ url +'</a>');
-                                    //   setTimeout(function() {
-                                    //       $previewer_container.fadeOut();
-                                    //   }, 2000)
-                                  }
+                                    if (/sameorigin/i.test(headers) || /deny/i.test(headers)) {
+                                        $previewer.html('<p class="previewer_error">Failed to load this site</p><p class="previewer_link">Go directly to <a target="_blank" class="scanned-by-link-previewer" href="' + url + '">'+ url +'</a>');
+                                    }
                                 });
                             }
                             setTimeout(function() {
