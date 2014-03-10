@@ -7,13 +7,15 @@
   "version": "0.0.2",
 
   "permissions": [
-    "*://*/*"
+    "*://*/*",
+    "history"
   ],
   "content_scripts": [{
     "matches": ["*://*/*"],
     "css": ["css/main.css"],
     "js": ["lib/jquery.2.0.3.min.js", "content.js"]
   }],
+  "background": {"scripts": ["background.js"]},
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",

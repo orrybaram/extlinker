@@ -20,14 +20,11 @@ $(function() {
                     $this.addClass('scanned-by-link-previewer');
 
                     var url = $(this).attr('href');
-
-
                     var blacklisted = false;
 
                     if (url.indexOf('.zip') > 0 || url.indexOf('mailto') > 0) {
                         blacklisted = true;
                     }
-                    console.log(blacklisted)
                     if(isExternal(url) && !blacklisted) {
                         $this.css({
                           'backgroundColor': shadeRGBColor($this.css('color'), .97),
@@ -37,6 +34,8 @@ $(function() {
                         })
 
                         hoverDelay($this, function() {
+
+                            chrome.extension.sendMessage({"url": url});
 
                             // URL IS AN IMAGE
                             if ( ( url.indexOf(".jpg") > 0 ) || ( url.indexOf(".png") > 0 ) || ( url.indexOf(".gif") > 0 ) ) {
