@@ -5,118 +5,119 @@ var hover_delay_interval = 1000;
 $(function() {
 
     // Check to see that we're not on an secured site, otherwise this thing wont work
-    if (window.location.protocol !== "https:") {
-        var $previewer_container = $('<div id="link-previewer-container"></div>');
-        var $previewer = $('<div id="link-previewer"></div>');
+    
+    var $previewer_container = $('<div id="link-previewer-container"></div>');
+    var $previewer = $('<div id="link-previewer"></div>');
 
-        $previewer_container.append($previewer);
-        $('body').append($previewer_container);
+    $previewer_container.append($previewer);
+    $('body').append($previewer_container);
 
-        function scanLinks() {
-            $('a').each(function() {
-                var $this = $(this);
+    function scanLinks() {
+        $('a').each(function() {
+            var $this = $(this);
 
-                if (!$this.hasClass('scanned-by-link-previewer')) {
-                    $this.addClass('scanned-by-link-previewer');
+            if (!$this.hasClass('scanned-by-link-previewer')) {
+                $this.addClass('scanned-by-link-previewer');
 
-                    var url = $(this).attr('href');
-                    var blacklisted = false;
-                    
-                    if (url) {
+                var url = $(this).attr('href');
+                var blacklisted = false;
+                
+                if (url) {
 
-                        if (url.indexOf('.zip') > 0 || url.indexOf('mailto') > 0) {
-                            blacklisted = true;
-                        }
-                        if(isExternal(url) && !blacklisted) {
-                            $this.css({
-                              'backgroundColor': $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.03)'),
-                              'border-bottom': '1px solid '+ $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.15)'),
-                              'text-decoration': 'none',
-                              'display': 'inline-block'
-                            })
+                    if (url.indexOf('.zip') > 0 || url.indexOf('mailto') > 0 || window.location.protocol === "https:" && !/https:/i.test(url)) {
+                        blacklisted = true;
+                    }
 
-                            hoverDelay($this, function() {
+                    if(isExternal(url) && !blacklisted) {
+                        $this.css({
+                          'backgroundColor': $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.03)'),
+                          'border-bottom': '1px solid '+ $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.15)'),
+                          'text-decoration': 'none',
+                          'display': 'inline-block'
+                        })
 
-                                chrome.extension.sendMessage({"url": url});
+                        hoverDelay($this, function() {
 
-                                // URL IS AN IMAGE
-                                if ( ( url.indexOf(".jpg") > 0 ) || ( url.indexOf(".png") > 0 ) || ( url.indexOf(".gif") > 0 ) ) {
-                                    var image = new Image();
-                                    image.src = url;
-                                    $previewer.html(image);
-                                    $(image).load(function() {
-                                        $previewer.css({ 'height': image.height, 'width': image.width })
-                                    })
-                                }
-                                else if ($this[0].host === 'vimeo.com') {
-                                    var video_id = $this[0].pathname.replace('/', '');
-                                    $previewer.html('<iframe src="//player.vimeo.com/video/' + video_id + '?color=c9ff23" width="1068" height="600" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>');
-                                    $previewer.css({ 'width': '1068', 'height': '600' })
-                                }
-                                else if ($this[0].host === 'www.youtube.com') {
-                                    var video_id = getParmFromHash(url, 'v')
-                                    $previewer.html('<iframe src="//www.youtube.com/embed/'+ video_id +'"></iframe>');
-                                    $previewer.css({ 'width': '1067', 'height': '600' })
-                                }
+                            chrome.extension.sendMessage({"url": url});
 
-                                else if ($this[0].host === 'youtu.be') {
-                                    var video_id = $this[0].pathname.replace('/', '');
-                                    $previewer.html('<iframe src="//www.youtube.com/embed/'+ video_id +'"></iframe>');
-                                    $previewer.css({ 'width': '1067', 'height': '600' })
-                                }
+                            // URL IS AN IMAGE
+                            if ( ( url.indexOf(".jpg") > 0 ) || ( url.indexOf(".png") > 0 ) || ( url.indexOf(".gif") > 0 ) ) {
+                                var image = new Image();
+                                image.src = url;
+                                $previewer.html(image);
+                                $(image).load(function() {
+                                    $previewer.css({ 'height': image.height, 'width': image.width })
+                                })
+                            }
+                            else if ($this[0].host === 'vimeo.com') {
+                                var video_id = $this[0].pathname.replace('/', '');
+                                $previewer.html('<iframe src="//player.vimeo.com/video/' + video_id + '?color=c9ff23" width="1068" height="600" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>');
+                                $previewer.css({ 'width': '1068', 'height': '600' })
+                            }
+                            else if ($this[0].host === 'www.youtube.com') {
+                                var video_id = getParmFromHash(url, 'v')
+                                $previewer.html('<iframe src="//www.youtube.com/embed/'+ video_id +'"></iframe>');
+                                $previewer.css({ 'width': '1067', 'height': '600' })
+                            }
 
-                                // URL IS AN EXTERNAL LINK
-                                else {
-                                    var $iframe = $('<iframe src="'+ url +'"></iframe>')
-                                    var $loading = $('<p class="loading">Loading...</p>')
+                            else if ($this[0].host === 'youtu.be') {
+                                var video_id = $this[0].pathname.replace('/', '');
+                                $previewer.html('<iframe src="//www.youtube.com/embed/'+ video_id +'"></iframe>');
+                                $previewer.css({ 'width': '1067', 'height': '600' })
+                            }
 
-                                    $previewer
-                                        .css({ 'width': window.innerWidth - 300, 'height': window.innerHeight - 100 })
-                                        .html('')
-                                        .append($loading)
-                                        .append($iframe);
+                            // URL IS AN EXTERNAL LINK
+                            else {
+                                var $iframe = $('<iframe src="'+ url +'"></iframe>')
+                                var $loading = $('<p class="loading">Loading...</p>')
 
-                                    $iframe.hide().load(function() {
-                                       $loading.hide();
-                                       $iframe.fadeIn();
-                                    })
+                                $previewer
+                                    .css({ 'width': window.innerWidth - 300, 'height': window.innerHeight - 100 })
+                                    .html('')
+                                    .append($loading)
+                                    .append($iframe);
 
-                                    // Test URL for errors
-                                    $.get(url).success(function(data, status, request) {
-                                        var headers = request.getAllResponseHeaders();
+                                $iframe.hide().load(function() {
+                                   $loading.hide();
+                                   $iframe.fadeIn();
+                                })
 
-                                        if (/sameorigin/i.test(headers) || /deny/i.test(headers)) {
-                                            $previewer.html('<p class="previewer_error">Failed to load this site</p><p class="previewer_link">Go directly to <a target="_blank" class="scanned-by-link-previewer" href="' + url + '">'+ url +'</a>');
-                                        }
-                                    });
-                                }
-                                setTimeout(function() {
-                                    if ($previewer.height() < window.innerHeight) {
-                                        $previewer.css({ 'top': '50%', 'margin-top': -$previewer.height() / 2, 'margin-left': -$previewer.width() / 2 })
-                                    } else {
-                                        $previewer.css({'top':'50px', 'margin-top': '0', 'margin-left': -$previewer.width() / 2 })
+                                // Test URL for errors
+                                $.get(url).success(function(data, status, request) {
+                                    var headers = request.getAllResponseHeaders();
+
+                                    if (/sameorigin/i.test(headers) || /deny/i.test(headers)) {
+                                        $previewer.html('<p class="previewer_error">Failed to load this site</p><p class="previewer_link">Go directly to <a target="_blank" class="scanned-by-link-previewer" href="' + url + '">'+ url +'</a>');
                                     }
-                                },100)
+                                });
+                            }
+                            setTimeout(function() {
+                                if ($previewer.height() < window.innerHeight) {
+                                    $previewer.css({ 'top': '50%', 'margin-top': -$previewer.height() / 2, 'margin-left': -$previewer.width() / 2 })
+                                } else {
+                                    $previewer.css({'top':'50px', 'margin-top': '0', 'margin-left': -$previewer.width() / 2 })
+                                }
+                            },100)
 
-                                $previewer_container.fadeIn();
+                            $previewer_container.fadeIn();
 
-                            }, function() {
-                                setTimeout(function() {
-                                    checkIfHovered($previewer, function() {
-                                        $previewer_container.fadeOut();
-                                        $previewer.find('iframe').remove();
-                                    })
-                                }, 100)
-                            });
-                        }
+                        }, function() {
+                            setTimeout(function() {
+                                checkIfHovered($previewer, function() {
+                                    $previewer_container.fadeOut();
+                                    $previewer.find('iframe').remove();
+                                })
+                            }, 100)
+                        });
                     }
                 }
-            });
+            }
+        });
 
-            setTimeout(function() { scanLinks() }, 5000);
-        }
-        scanLinks();
+        setTimeout(function() { scanLinks() }, 5000);
     }
+    scanLinks();
+    
 });
 
 // UTILS =============================================== //
