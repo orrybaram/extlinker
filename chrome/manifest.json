@@ -4,7 +4,7 @@
   "name": "Lazy Linker",
   "description": "Provides previews to external links, images, and videos in articles when a link is hover over.",
 
-  "version": "0.1.1",
+  "version": "0.1.2",
 
   "permissions": [
     "*://*/*",
