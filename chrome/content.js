@@ -31,9 +31,8 @@ $(function() {
                     if(isExternal(url) && !blacklisted) {
                         $this.css({
                           'backgroundColor': $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.03)'),
-                          'border-bottom': '1px solid '+ $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.15)'),
+                          'border-bottom': '1px dashed '+ $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.15)'),
                           'text-decoration': 'none',
-                          'display': 'inline-block'
                         })
 
                         hoverDelay($this, function() {
