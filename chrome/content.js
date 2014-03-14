@@ -30,10 +30,11 @@ $(function() {
 
                     if(isExternal(url) && !blacklisted) {
                         $this.css({
-                          'backgroundColor': $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.03)'),
                           'border-bottom': '1px dashed '+ $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.15)'),
                           'text-decoration': 'none',
                         })
+
+                        if($this.css('backgroundColor') === 'rgba(0, 0, 0, 0)') !$this.css({'backgroundColor': $this.css('color').replace('rgb', 'rgba').replace(')', ', 0.03)') });
 
                         hoverDelay($this, function() {
 
