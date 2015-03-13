@@ -1,6 +1,6 @@
 // Content
 
-var MOUSEPRESS_TIME = 750;
+var MOUSEPRESS_TIME = 500;
 
 $(function() {
 
@@ -133,7 +133,7 @@ $(function() {
 
         $el.on("mousedown", function(e) {
             var $this = $(this);
-
+            long_clicked = false;
             $this.data("checkdown", setTimeout(function () {
                 console.log('lognpresse');
                 long_clicked = true;
@@ -145,10 +145,12 @@ $(function() {
         .on("mouseup", function(e) {
             clearTimeout($(this).data("checkdown"));
             if(!long_clicked) {
-                window.location = $el.attr('href');
+                window.open($el.attr('href'));
+                long_clicked = false;
             }
         })
         .on("mouseout", function() {
+            long_clicked = false;
             clearTimeout($(this).data("checkdown"));
         });
     }
